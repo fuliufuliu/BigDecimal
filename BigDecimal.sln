@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigDecimal", "BigDecimal\BigDecimal.csproj", "{69B47591-F733-4C78-9FC4-B0EDE32BDC8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BigDecimalTests", "BigDecimalTests\BigDecimalTests.csproj", "{3872130C-8A1F-4319-BCEC-A2E230258899}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69B47591-F733-4C78-9FC4-B0EDE32BDC8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69B47591-F733-4C78-9FC4-B0EDE32BDC8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69B47591-F733-4C78-9FC4-B0EDE32BDC8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69B47591-F733-4C78-9FC4-B0EDE32BDC8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3872130C-8A1F-4319-BCEC-A2E230258899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3872130C-8A1F-4319-BCEC-A2E230258899}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3872130C-8A1F-4319-BCEC-A2E230258899}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3872130C-8A1F-4319-BCEC-A2E230258899}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
