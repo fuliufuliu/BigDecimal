@@ -23,7 +23,7 @@ namespace BigDecimals
             MaxPrecision = maxPrecision;
         }
 
-        public BigDecimal(BigDecimal v, int precision) : this(v, precision, precision) { }
+        public BigDecimal(BigDecimal v, int precision) : this(v, precision, 100) { }
 
         public BigDecimal(BigDecimal v) : this(v, 0) { }
 
@@ -36,7 +36,7 @@ namespace BigDecimals
 
         public BigDecimal(BigInteger v) : this(v, 0) { }
 
-        public BigDecimal(BigInteger v, int precision) : this(v, precision, precision) { }
+        public BigDecimal(BigInteger v, int precision) : this(v, precision, 100) { }
 
         public BigDecimal(int v) : this(new BigInteger(v), 0) { }
 
@@ -178,7 +178,7 @@ namespace BigDecimals
             return Sqrt(b, b.MaxPrecision);
         }
 
-        public static BigDecimal Pow(BigDecimal b, int e, int maxPrecision)
+        private static BigDecimal PowRecur(BigDecimal b, int e, int maxPrecision)
         {
             BigDecimal result;
             if(e == 0)
@@ -187,45 +187,57 @@ namespace BigDecimals
             }
             if(e == 1)
             {
-                return new BigDecimal(b, maxPrecision, maxPrecision);
+                return new BigDecimal(b, maxPrecision + b.Precision, maxPrecision);
             }
             if(e == 2)
             {
                 result = mul(b, b, maxPrecision);
-                result.Precision += b.Precision;
                 return result;
             }
             if(e % 2 == 1)
             {
                 result = mul(b, Pow(b, e - 1, maxPrecision + b.Precision), maxPrecision + b.Precision);
-                result.Precision += b.Precision;
                 return result;
             }
             else
             {
                 result = Pow(b, e / 2, maxPrecision + b.Precision);
                 result = mul(result, result, maxPrecision + b.Precision);
-                result.Precision += (2 * b.Precision);
                 return result;
             }
         }
 
-        public static BigDecimal Pow(BigDecimal b, int e)
+        public static BigDecimal Pow(BigDecimal b, int e, int maxPrecision)
         {
-            return Pow(b, e, b.MaxPrecision);
+            BigDecimal result = PowRecur(b, e, maxPrecision);
+            result.Clean(b.Precision);
+            return result;
         }
 
-        public void Clean()
+        public static BigDecimal Pow(BigDecimal b, int e)
+        {
+            BigDecimal result = PowRecur(b, e, b.MaxPrecision);
+            result.Clean();
+            return result;
+        }
+
+        public void Clean(int offset)
         {
             while(Precision > 0 && Value % TEN == 0)
             {
                 Value /= TEN;
                 Precision--;
             }
-            if(Precision > MaxPrecision)
+            while(Precision > (MaxPrecision - offset))
             {
-                Precision = MaxPrecision;
+                Value /= TEN;
+                Precision--;
             }
+        }
+
+        public void Clean()
+        {
+            Clean(0);
         }
 
         public override string ToString()

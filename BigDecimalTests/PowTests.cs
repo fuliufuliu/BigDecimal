@@ -33,5 +33,12 @@ namespace BigDecimalTests
             Assert.AreEqual(new BigDecimal(9528128, 6), BigDecimal.Pow(bd, 3));
             Assert.AreEqual(new BigDecimal(2019963136, 8), BigDecimal.Pow(bd, 4));
         }
+
+        [TestMethod]
+        public void DecimalPowerLimitPrecisionTest()
+        {
+            BigDecimal bd = new BigDecimal(22222, 4);
+            Assert.AreEqual(new BigDecimal(29365096514548, 10), BigDecimal.Pow(bd, 10, 10));
+        }
     }
 }
