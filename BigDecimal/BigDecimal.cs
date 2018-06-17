@@ -44,6 +44,24 @@ namespace BigDecimals
 
         public BigDecimal(int v, int precision, int maxPrecision) : this(new BigInteger(v), precision, maxPrecision) { }
 
+        public BigDecimal(string s) : this(s, 100) { }
+
+        public BigDecimal(string s, int maxPrecision)
+        {
+            int dec;
+            if((dec = s.IndexOf('.')) >= 0)
+            {
+                s = s.Remove(dec, 1);
+            }
+            else
+            {
+                dec = s.Length;
+            }
+            this.Value = BigInteger.Parse(s);
+            this.Precision = s.Length - dec;
+            this.MaxPrecision = 100;
+        }
+
         public static BigDecimal operator +(BigDecimal left, BigDecimal right)
         {
             return add(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));

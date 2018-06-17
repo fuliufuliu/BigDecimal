@@ -1,5 +1,6 @@
 ﻿using System;
 using BigDecimals;
+using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BigDecimalTests
@@ -37,8 +38,9 @@ namespace BigDecimalTests
         [TestMethod]
         public void DecimalPowerLimitPrecisionTest()
         {
-            BigDecimal bd = new BigDecimal(22222, 4);
-            Assert.AreEqual(new BigDecimal(29365096514548, 10), BigDecimal.Pow(bd, 10, 10));
+            BigDecimal bd = new BigDecimal(22, 1);
+            Assert.AreEqual(new BigDecimal(265599227, 5), BigDecimal.Pow(bd, 10, 5));
+            Assert.AreEqual(new BigDecimal(BigInteger.Parse("70542949868640404"), 10), BigDecimal.Pow(bd, 20, 10));
         }
     }
 }
