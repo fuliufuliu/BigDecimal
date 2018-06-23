@@ -62,6 +62,16 @@ namespace BigDecimals
             this.MaxPrecision = 100;
         }
 
+        public static implicit operator BigDecimal(BigInteger v)
+        {
+            return new BigDecimal(v);
+        }
+
+        public static implicit operator BigDecimal(int v)
+        {
+            return new BigDecimal(v);
+        }
+
         public static BigDecimal operator +(BigDecimal left, BigDecimal right)
         {
             return add(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
@@ -205,7 +215,7 @@ namespace BigDecimals
             }
             if(e == 1)
             {
-                return new BigDecimal(b, maxPrecision + b.Precision, maxPrecision);
+                return new BigDecimal(b, b.Precision, maxPrecision);
             }
             if(e == 2)
             {
@@ -235,6 +245,30 @@ namespace BigDecimals
         public static BigDecimal Pow(BigDecimal b, int e)
         {
             BigDecimal result = PowRecur(b, e, b.MaxPrecision);
+            result.Clean();
+            return result;
+        }
+
+        public static BigDecimal Ln(BigDecimal b)
+        {
+            return Ln(b, b.MaxPrecision);
+        }
+
+        public static BigDecimal Ln(BigDecimal b, int maxPrecision)
+        {
+            BigDecimal result = new BigDecimal(0, 0, maxPrecision);
+            BigDecimal inter = new BigDecimal(0, 0, maxPrecision);
+            BigDecimal bound = new BigDecimal(1, maxPrecision, maxPrecision);
+            BigDecimal power = div((b - ONE), (b + ONE), maxPrecision);
+            BigDecimal n = new BigDecimal(0, 0, maxPrecision);
+            int nInt = 0;
+            do
+            {
+                inter = 2 * (1 / (2 * n + 1)) * Pow(power, 2 * nInt + 1);
+                n += 1;
+                nInt += 1;
+                result += inter;
+            } while(inter > bound);
             result.Clean();
             return result;
         }
@@ -305,6 +339,36 @@ namespace BigDecimals
                 return -1;
             }
             return 0;
+        }
+
+        public static bool operator >(BigDecimal left, BigDecimal right)
+        {
+            return left.CompareTo(right) > 0;
+        }
+
+        public static bool operator <(BigDecimal left, BigDecimal right)
+        {
+            return left.CompareTo(right) < 0;
+        }
+
+        public static bool operator ==(BigDecimal left, BigDecimal right)
+        {
+            return left.CompareTo(right) == 0;
+        }
+
+        public static bool operator !=(BigDecimal left, BigDecimal right)
+        {
+            return !(left == right); 
+        }
+
+        public static bool operator >=(BigDecimal left, BigDecimal right)
+        {
+            return left.CompareTo(right) >= 0;
+        }
+
+        public static bool operator <=(BigDecimal left, BigDecimal right)
+        {
+            return left.CompareTo(right) <= 0;
         }
 
         public object Clone()
