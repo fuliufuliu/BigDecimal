@@ -74,10 +74,10 @@ namespace BigDecimals
 
         public static BigDecimal operator +(BigDecimal left, BigDecimal right)
         {
-            return add(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
+            return Add(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
         }
 
-        private static BigDecimal add(BigDecimal left, BigDecimal right, int maxPrecision)
+        private static BigDecimal Add(BigDecimal left, BigDecimal right, int maxPrecision)
         {
             BigInteger newVal = BigInteger.Pow(TEN, right.Precision) * left.Value + BigInteger.Pow(TEN, left.Precision) * right.Value;
             BigDecimal result = new BigDecimal(newVal, left.Precision + right.Precision, maxPrecision);
@@ -87,10 +87,10 @@ namespace BigDecimals
 
         public static BigDecimal operator -(BigDecimal left, BigDecimal right)
         {
-            return sub(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
+            return Sub(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
         }
 
-        private static BigDecimal sub(BigDecimal left, BigDecimal right, int maxPrecision)
+        private static BigDecimal Sub(BigDecimal left, BigDecimal right, int maxPrecision)
         {
             BigInteger newVal = BigInteger.Pow(TEN, right.Precision) * left.Value - BigInteger.Pow(TEN, left.Precision) * right.Value;
             BigDecimal result = new BigDecimal(newVal, left.Precision + right.Precision, maxPrecision);
@@ -100,10 +100,10 @@ namespace BigDecimals
 
         public static BigDecimal operator *(BigDecimal left, BigDecimal right)
         {
-            return mul(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
+            return Mul(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
         }
 
-        private static BigDecimal mul(BigDecimal left, BigDecimal right, int maxPrecision)
+        private static BigDecimal Mul(BigDecimal left, BigDecimal right, int maxPrecision)
         {
             BigDecimal result = new BigDecimal(left.Value * right.Value, left.Precision + right.Precision, maxPrecision);
             result.Clean();
@@ -112,10 +112,10 @@ namespace BigDecimals
 
         public static BigDecimal operator /(BigDecimal left, BigDecimal right)
         {
-            return div(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
+            return Div(left, right, Math.Min(left.MaxPrecision, right.MaxPrecision));
         }
 
-        private static BigDecimal div(BigDecimal left, BigDecimal right, int maxPrecision)
+        private static BigDecimal Div(BigDecimal left, BigDecimal right, int maxPrecision)
         {
             BigDecimal result = new BigDecimal(new BigInteger(0), left.Precision - right.Precision, maxPrecision);
             BigInteger leftVal = left.Value, rightVal = right.Value, division;
@@ -135,11 +135,11 @@ namespace BigDecimals
             return result;
         }
 
-        public static BigDecimal Sqrt(BigDecimal b, int maxPrecision)
+        public static BigDecimal Sqrt(BigDecimal x, int maxPrecision)
         {
-            if(b.Value > 0)
+            if(x.Value > 0)
             {
-                string s_b = b.ToString();
+                string s_b = x.ToString();
                 int decimalIndex = s_b.IndexOf('.');
                 BigDecimal result = new BigDecimal(0, -(int)Math.Ceiling(decimalIndex / 2.0), maxPrecision);
                 if(decimalIndex % 2 == 1)
@@ -193,7 +193,7 @@ namespace BigDecimals
                 }
                 return result;
             }
-            else if(b.Value == 0)
+            else if(x.Value == 0)
             {
                 return new BigDecimal(ZERO, 0, maxPrecision);
             }
@@ -201,9 +201,9 @@ namespace BigDecimals
             
         }
 
-        public static BigDecimal Sqrt(BigDecimal b)
+        public static BigDecimal Sqrt(BigDecimal x)
         {
-            return Sqrt(b, b.MaxPrecision);
+            return Sqrt(x, x.MaxPrecision);
         }
 
         private static BigDecimal PowRecur(BigDecimal b, int e, int maxPrecision)
@@ -219,18 +219,18 @@ namespace BigDecimals
             }
             if(e == 2)
             {
-                result = mul(b, b, maxPrecision);
+                result = Mul(b, b, maxPrecision);
                 return result;
             }
             if(e % 2 == 1)
             {
-                result = mul(b, Pow(b, e - 1, maxPrecision + b.Precision), maxPrecision + b.Precision);
+                result = Mul(b, Pow(b, e - 1, maxPrecision + b.Precision), maxPrecision + b.Precision);
                 return result;
             }
             else
             {
                 result = Pow(b, e / 2, maxPrecision + b.Precision);
-                result = mul(result, result, maxPrecision + b.Precision);
+                result = Mul(result, result, maxPrecision + b.Precision);
                 return result;
             }
         }
@@ -249,17 +249,18 @@ namespace BigDecimals
             return result;
         }
 
-        public static BigDecimal Ln(BigDecimal b)
+        public static BigDecimal Ln(BigDecimal x)
         {
-            return Ln(b, b.MaxPrecision);
+            return Ln(x, x.MaxPrecision);
         }
 
-        public static BigDecimal Ln(BigDecimal b, int maxPrecision)
+        public static BigDecimal Ln(BigDecimal x, int maxPrecision)
         {
+            maxPrecision++;
             BigDecimal result = new BigDecimal(0, 0, maxPrecision);
             BigDecimal inter = new BigDecimal(0, 0, maxPrecision);
             BigDecimal bound = new BigDecimal(1, maxPrecision, maxPrecision);
-            BigDecimal power = div((b - ONE), (b + ONE), maxPrecision);
+            BigDecimal power = Div((x - ONE), (x + ONE), maxPrecision);
             BigDecimal n = new BigDecimal(0, 0, maxPrecision);
             int nInt = 0;
             do
@@ -269,6 +270,36 @@ namespace BigDecimals
                 nInt += 1;
                 result += inter;
             } while(inter > bound);
+
+            result.MaxPrecision--;
+            result.Clean();
+            return result;
+        }
+
+        public static BigDecimal Exp(BigDecimal x)
+        {
+            return Exp(x, x.MaxPrecision);
+        }
+
+        public static BigDecimal Exp(BigDecimal x, int maxPrecision)
+        {
+            maxPrecision++;
+            BigDecimal result = new BigDecimal(1, 0, maxPrecision);
+            BigDecimal denom = new BigDecimal(1, 0, maxPrecision);
+            BigDecimal numer = new BigDecimal(x, x.Precision, maxPrecision);
+            BigDecimal inter = new BigDecimal(0, 0, maxPrecision);
+            BigDecimal bound = new BigDecimal(1, maxPrecision, maxPrecision);
+            int nInt = 2;
+            do
+            {
+                inter = Div(numer, denom, maxPrecision);
+                denom = Mul(denom, nInt, maxPrecision);
+                numer = Mul(numer, x, maxPrecision);
+                result += inter;
+                nInt++;
+            } while(inter > bound);
+
+            result.MaxPrecision--;
             result.Clean();
             return result;
         }
