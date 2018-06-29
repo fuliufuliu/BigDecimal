@@ -262,16 +262,25 @@ namespace BigDecimals
             BigDecimal bound = new BigDecimal(1, maxPrecision, maxPrecision);
             BigDecimal power = Div((x - ONE), (x + ONE), maxPrecision);
             BigDecimal n = new BigDecimal(0, 0, maxPrecision);
-            int nInt = 0;
+            int nInt = 0, oldWhole = 0;
             do
             {
                 inter = 2 * (1 / (2 * n + 1)) * Pow(power, 2 * nInt + 1);
                 n += 1;
                 nInt += 1;
                 result += inter;
+                int whole = result.ToString().Split('.')[0].Length;
+                if(whole > 0 && whole != oldWhole)
+                {
+                    result = new BigDecimal(result, result.Precision, result.MaxPrecision + (whole - oldWhole));
+                    bound = new BigDecimal(1, maxPrecision + whole, maxPrecision + (whole - oldWhole));
+                    power = Div((x - ONE), (x + ONE), maxPrecision + (whole - oldWhole));
+                    n = new BigDecimal(n, n.Precision, maxPrecision + (whole - oldWhole));
+                    oldWhole = whole;
+                }
             } while(inter > bound);
 
-            result.MaxPrecision--;
+            result.MaxPrecision -= (oldWhole + 1);
             result.Clean();
             return result;
         }
@@ -289,17 +298,26 @@ namespace BigDecimals
             BigDecimal numer = new BigDecimal(x, x.Precision, maxPrecision);
             BigDecimal inter = new BigDecimal(0, 0, maxPrecision);
             BigDecimal bound = new BigDecimal(1, maxPrecision, maxPrecision);
-            int nInt = 2;
+            int nInt = 2, oldWhole = 0, whole = 0;
             do
             {
-                inter = Div(numer, denom, maxPrecision);
+                inter = Div(numer, denom, maxPrecision + (whole - oldWhole));
                 denom = Mul(denom, nInt, maxPrecision);
                 numer = Mul(numer, x, maxPrecision);
                 result += inter;
                 nInt++;
+                whole = result.ToString().Split('.')[0].Length;
+                if(whole > 0 && whole != oldWhole)
+                {
+                    result = new BigDecimal(result, result.Precision, result.MaxPrecision + (whole - oldWhole));
+                    bound = new BigDecimal(1, maxPrecision + whole, maxPrecision + (whole - oldWhole));
+                    denom = new BigDecimal(denom, denom.Precision, maxPrecision + (whole - oldWhole));
+                    numer = new BigDecimal(numer, numer.Precision, maxPrecision + (whole - oldWhole));
+                    oldWhole = whole;
+                }
             } while(inter > bound);
 
-            result.MaxPrecision--;
+            result.MaxPrecision -= oldWhole;
             result.Clean();
             return result;
         }
