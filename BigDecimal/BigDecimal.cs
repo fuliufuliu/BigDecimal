@@ -13,7 +13,13 @@ namespace BigDecimals
         private static readonly BigInteger ONE = new BigInteger(1);
         private static readonly BigInteger ZERO = new BigInteger(0);
         private BigInteger Value { get; set; }
+        /// <summary>
+        /// 小数精度
+        /// </summary>
         private int Precision { get; set; }
+        /// <summary>
+        /// 最大小数精度
+        /// </summary>
         private int MaxPrecision { get; set; }
 
         public BigDecimal(BigDecimal v, int precision, int maxPrecision)
@@ -49,7 +55,7 @@ namespace BigDecimals
         public BigDecimal(string s, int maxPrecision)
         {
             int dec;
-            if((dec = s.IndexOf('.')) >= 0)
+            if ((dec = s.IndexOf('.')) >= 0)
             {
                 s = s.Remove(dec, 1);
             }
@@ -119,9 +125,9 @@ namespace BigDecimals
         {
             BigDecimal result = new BigDecimal(new BigInteger(0), left.Precision - right.Precision, maxPrecision);
             BigInteger leftVal = left.Value, rightVal = right.Value, division;
-            while(result.Precision < result.MaxPrecision && leftVal != ZERO)
+            while (result.Precision < result.MaxPrecision && leftVal != ZERO)
             {
-                if(leftVal < rightVal)
+                if (leftVal < rightVal)
                 {
                     leftVal *= TEN;
                     result.Precision++;
@@ -137,12 +143,12 @@ namespace BigDecimals
 
         public static BigDecimal Sqrt(BigDecimal x, int maxPrecision)
         {
-            if(x.Value > 0)
+            if (x.Value > 0)
             {
                 string s_b = x.ToString();
                 int decimalIndex = s_b.IndexOf('.');
                 BigDecimal result = new BigDecimal(0, -(int)Math.Ceiling(decimalIndex / 2.0), maxPrecision);
-                if(decimalIndex % 2 == 1)
+                if (decimalIndex % 2 == 1)
                 {
                     s_b = "0" + s_b;
                     s_b = s_b.Remove(decimalIndex + 1, 1);
@@ -151,24 +157,24 @@ namespace BigDecimals
                 {
                     s_b = s_b.Remove(decimalIndex, 1);
                 }
-                if((s_b.Length - decimalIndex) % 2 == Convert.ToInt32(s_b[0] != '0'))
+                if ((s_b.Length - decimalIndex) % 2 == Convert.ToInt32(s_b[0] != '0'))
                 {
                     s_b = s_b + "0";
                 }
 
                 Queue<int> digitPairs = new Queue<int>();
-                for(int i = 0; i < s_b.Length; i += 2)
+                for (int i = 0; i < s_b.Length; i += 2)
                 {
                     digitPairs.Enqueue(int.Parse(s_b.Substring(i, 2)));
                 }
                 BigInteger remainder = 0, currentValue = 0;
-                while(digitPairs.Count >= 0 && result.Precision <= maxPrecision)
+                while (digitPairs.Count >= 0 && result.Precision <= maxPrecision)
                 {
-                    if(remainder == 0 && digitPairs.Count == 0)
+                    if (remainder == 0 && digitPairs.Count == 0)
                     {
                         break;
                     }
-                    if(digitPairs.Count > 0)
+                    if (digitPairs.Count > 0)
                     {
                         currentValue = remainder * 100 + digitPairs.Dequeue();
                     }
@@ -183,7 +189,7 @@ namespace BigDecimals
                     {
                         x_max++;
                         y = x_max * (y_base + x_max);
-                    } while(y <= currentValue);
+                    } while (y <= currentValue);
                     x_max--;
                     y = x_max * (y_base + x_max);
                     remainder = currentValue - y;
@@ -193,12 +199,12 @@ namespace BigDecimals
                 }
                 return result;
             }
-            else if(x.Value == 0)
+            else if (x.Value == 0)
             {
                 return new BigDecimal(ZERO, 0, maxPrecision);
             }
             throw new ArgumentException("Argument to square root is negative.");
-            
+
         }
 
         public static BigDecimal Sqrt(BigDecimal x)
@@ -209,20 +215,20 @@ namespace BigDecimals
         private static BigDecimal PowRecur(BigDecimal b, int e, int maxPrecision)
         {
             BigDecimal result;
-            if(e == 0)
+            if (e == 0)
             {
                 return new BigDecimal(ONE, maxPrecision);
             }
-            if(e == 1)
+            if (e == 1)
             {
                 return new BigDecimal(b, b.Precision, maxPrecision);
             }
-            if(e == 2)
+            if (e == 2)
             {
                 result = Mul(b, b, maxPrecision);
                 return result;
             }
-            if(e % 2 == 1)
+            if (e % 2 == 1)
             {
                 result = Mul(b, Pow(b, e - 1, maxPrecision + b.Precision), maxPrecision + b.Precision);
                 return result;
@@ -270,7 +276,7 @@ namespace BigDecimals
                 nInt += 1;
                 result += inter;
                 int whole = result.ToString().Split('.')[0].Length;
-                if(whole > 0 && whole != oldWhole)
+                if (whole > 0 && whole != oldWhole)
                 {
                     result = new BigDecimal(result, result.Precision, result.MaxPrecision + (whole - oldWhole));
                     bound = new BigDecimal(1, maxPrecision + whole, maxPrecision + (whole - oldWhole));
@@ -278,7 +284,7 @@ namespace BigDecimals
                     n = new BigDecimal(n, n.Precision, maxPrecision + (whole - oldWhole));
                     oldWhole = whole;
                 }
-            } while(inter > bound);
+            } while (inter > bound);
 
             result.MaxPrecision -= (oldWhole + 1);
             result.Clean();
@@ -290,6 +296,12 @@ namespace BigDecimals
             return Exp(x, x.MaxPrecision);
         }
 
+        /// <summary>
+        /// 求e的几次方
+        /// </summary>
+        /// <param name="x">次方</param>
+        /// <param name="maxPrecision">最大精度，经过测试最后位数可能不准确，使用时注意</param>
+        /// <returns></returns>
         public static BigDecimal Exp(BigDecimal x, int maxPrecision)
         {
             maxPrecision++;
@@ -307,7 +319,7 @@ namespace BigDecimals
                 result += inter;
                 nInt++;
                 whole = result.ToString().Split('.')[0].Length;
-                if(whole > 0 && whole != oldWhole)
+                if (whole > 0 && whole != oldWhole)
                 {
                     result = new BigDecimal(result, result.Precision, result.MaxPrecision + (whole - oldWhole));
                     bound = new BigDecimal(1, maxPrecision + whole, maxPrecision + (whole - oldWhole));
@@ -315,7 +327,7 @@ namespace BigDecimals
                     numer = new BigDecimal(numer, numer.Precision, maxPrecision + (whole - oldWhole));
                     oldWhole = whole;
                 }
-            } while(inter > bound);
+            } while (inter > bound);
 
             result.MaxPrecision -= oldWhole;
             result.Clean();
@@ -324,12 +336,12 @@ namespace BigDecimals
 
         public void Clean(int offset)
         {
-            while(Precision > 0 && Value % TEN == 0)
+            while (Precision > 0 && Value % TEN == 0)
             {
                 Value /= TEN;
                 Precision--;
             }
-            while(Precision > (MaxPrecision - offset))
+            while (Precision > (MaxPrecision - offset))
             {
                 Value /= TEN;
                 Precision--;
@@ -344,7 +356,7 @@ namespace BigDecimals
         public override string ToString()
         {
             string s = Value.ToString();
-            while(Precision > s.Length)
+            while (Precision > s.Length)
             {
                 s = "0" + s;
             }
@@ -358,7 +370,7 @@ namespace BigDecimals
 
         public override bool Equals(object obj)
         {
-            if(obj is BigDecimal)
+            if (obj is BigDecimal)
             {
                 return this.CompareTo((BigDecimal)obj) == 0;
             }
@@ -368,22 +380,23 @@ namespace BigDecimals
         public int CompareTo(BigDecimal other)
         {
             int precisionDifference = this.Precision - other.Precision;
-            BigInteger thisV = this.Value, otherV = other.Value;
-            while(precisionDifference > 0)
+            BigInteger thisV = this.Value,
+                        otherV = other.Value;
+            while (precisionDifference > 0)
             {
                 otherV *= TEN;
                 precisionDifference--;
             }
-            while(precisionDifference < 0)
+            while (precisionDifference < 0)
             {
                 thisV *= TEN;
                 precisionDifference++;
             }
-            if(thisV > otherV)
+            if (thisV > otherV)
             {
                 return 1;
             }
-            else if(thisV < otherV)
+            if (thisV < otherV)
             {
                 return -1;
             }
@@ -407,7 +420,7 @@ namespace BigDecimals
 
         public static bool operator !=(BigDecimal left, BigDecimal right)
         {
-            return !(left == right); 
+            return !(left == right);
         }
 
         public static bool operator >=(BigDecimal left, BigDecimal right)
@@ -423,6 +436,44 @@ namespace BigDecimals
         public object Clone()
         {
             return new BigDecimal(this);
+        }
+
+        public static explicit operator double(BigDecimal a)
+        {
+            return double.Parse(a.ToString());
+        }
+
+        public static explicit operator float(BigDecimal a)
+        {
+            return float.Parse(a.ToString());
+        }
+
+        public static BigDecimal operator %(BigDecimal left, int right)
+        {
+            var v = left.Value / BigInteger.Pow(10, left.Precision);        // 取left的整数部分
+            var v1 = v % right;                         // 取left的整数部分的余数
+            return v1 + (left - v);                     // 用整数部分的余数 + left的小数部分
+        }
+
+        public static BigDecimal operator %(BigDecimal left, long right)
+        {
+            var v = left.Value / BigInteger.Pow(10, left.Precision);        // 取left的整数部分
+            var v1 = v % right;                         // 取left的整数部分的余数
+            return v1 + (left - v);                     // 用整数部分的余数 + left的小数部分
+        }
+
+        /// <summary>
+        /// 5.011 % 0.25 = (501.1 % 25) / 100 = 0.011
+        /// 45.88 % 0.7 = 0.38
+        /// </summary>
+        /// <returns></returns>
+        public static BigDecimal operator %(BigDecimal left, BigDecimal right)
+        {
+            var _r = right.Value; // 将 right 扩大 10 的 right.Precision 次方倍 得到 _r
+            var _l = left * BigInteger.Pow(10, right.Precision); // 将 left 扩大10 的 right.Precision 次方倍 得到 _l
+            var v = _l.Value / BigInteger.Pow(10, _l.Precision);    // 取 _l 的整数部分
+            var v1 = v % _r;                                             // 取 _l 整数部分的余数
+            return (v1 + (_l - v)) / BigInteger.Pow(10, right.Precision);   // 在余数的基础上缩小 10 的 right.Precision 次方倍
         }
     }
 }
