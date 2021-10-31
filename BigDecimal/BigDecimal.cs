@@ -448,6 +448,21 @@ namespace BigDecimals
             return float.Parse(a.ToString());
         }
 
+        public static explicit operator BigInteger(BigDecimal a)
+        {
+            return a.Value / (BigInteger.Pow(10, a.Precision));
+        }
+
+        public static implicit operator BigDecimal(double a)
+        {
+            return new BigDecimal(a.ToString("R"));
+        }
+
+        public static implicit operator BigDecimal(float a)
+        {
+            return new BigDecimal(a.ToString("R"));
+        }
+
         public static BigDecimal operator %(BigDecimal left, int right)
         {
             var v = left.Value / BigInteger.Pow(10, left.Precision);        // 取left的整数部分
